@@ -1,7 +1,7 @@
 from locale import resetlocale
 #from tracemalloc import reset_peak
 import telebot
-import nn1
+from nn1 import TextPredictor
 #from nn1 import buildPhrase
 # NeuralNetworkObject
 
@@ -13,8 +13,9 @@ def start(m, res=False):
 
 @bot.message_handler(content_types=["text"])
 def handle_text(message):
+    textPredictor = TextPredictor()
     # reusltText = NeuralNetworkObject.getResult(message.text)
-    res = nn1.buildPhrase(message.text)
+    res = textPredictor.buildPhrase(message.text)
     #res = buildPhrase(message.text)
     bot.send_message(message.chat.id, resetlocale) # bot.send_message(message.chat.id, reusltText)
 
