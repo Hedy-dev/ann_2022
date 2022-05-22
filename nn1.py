@@ -27,6 +27,7 @@ def creat_and_train_model():
     # print(res.shape)
     res = np.array( data[0] )
 
+
     inp_words = 3
     n = res.shape[0] - inp_words
 
