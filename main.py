@@ -17,6 +17,6 @@ def handle_text(message):
     # reusltText = NeuralNetworkObject.getResult(message.text)
     res = textPredictor.buildPhrase(message.text)
     #res = buildPhrase(message.text)
-    bot.send_message(message.chat.id, resetlocale) # bot.send_message(message.chat.id, reusltText)
+    bot.send_message(message.chat.id, res) # bot.send_message(message.chat.id, reusltText)
 
 bot.polling(none_stop=True, interval=0)
