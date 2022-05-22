@@ -8,13 +8,24 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.preprocessing.text import Tokenizer, text_to_word_sequence
 from tensorflow.keras.utils import to_categorical
 
-class textPredictor:
+class TextPredictor:
     def __init__(self):
-        self.model = self.load_model() 
+
+        #constants        
         self.inp_words = 3
+        self.path = ""
+
+        self.model = ''
+        self.load_model()
     
     def load_model(self, path=""):
-        pass
+        if path == "":
+            path = self.path
+        if open(path):
+            self.model.load_model(path)
+        else:
+            self.create_and_train_model()
+
     def buildPhrase(self, texts, str_len=2):
         res = texts
         data = tokenizer.texts_to_sequences([texts])[0]
@@ -32,44 +43,45 @@ class textPredictor:
 
         return res
 
-def create_and_train_model():
-    with open('text.txt', 'r', encoding='utf-8') as f:
-        texts = f.read()
-        texts = texts.replace('\ufeff', '')  # убираем первый невидимый символ
+    def create_and_train_model(self):
+        with open('text.txt', 'r', encoding='utf-8') as f:
+            texts = f.read()
+            texts = texts.replace('\ufeff', '')  # убираем первый невидимый символ
 
-    maxWordsCount = 1000
-    tokenizer = Tokenizer(num_words=maxWordsCount, filters='!–"—#$%&amp;()*+,-./:;<=>?@[\\]^_`{|}~\t\n\r«»',
-                          lower=True, split=' ', char_level=False)
-    tokenizer.fit_on_texts([texts])
+        maxWordsCount = 1000
+        tokenizer = Tokenizer(num_words=maxWordsCount, filters='!–"—#$%&amp;()*+,-./:;<=>?@[\\]^_`{|}~\t\n\r«»',
+                              lower=True, split=' ', char_level=False)
+        tokenizer.fit_on_texts([texts])
 
-    dist = list(tokenizer.word_counts.items())
-    print(dist[:10])
+        dist = list(tokenizer.word_counts.items())
+        print(dist[:10])
 
-    data = tokenizer.texts_to_sequences([texts])
-    # res = to_categorical(data[0], num_classes=maxWordsCount)
-    # print(res.shape)
-    res = np.array( data[0] )
+        data = tokenizer.texts_to_sequences([texts])
+        # res = to_categorical(data[0], num_classes=maxWordsCount)
+        # print(res.shape)
+        res = np.array( data[0] )
 
-    inp_words = 3
-    n = res.shape[0] - inp_words
+        inp_words = 3
+        n = res.shape[0] - inp_words
 
-    X = np.array([res[i:i + inp_words] for i in range(n)])
-    Y = to_categorical(res[inp_words:], num_classes=maxWordsCount)
+        X = np.array([res[i:i + inp_words] for i in range(n)])
+        Y = to_categorical(res[inp_words:], num_classes=maxWordsCount)
 
-    model = Sequential()
-    model.add(Embedding(maxWordsCount, 256, input_length = inp_words))
-    model.add(SimpleRNN(128, activation='tanh'))
-    model.add(Dense(maxWordsCount, activation='softmax'))
-    model.summary()
+        model = Sequential()
+        model.add(Embedding(maxWordsCount, 256, input_length = inp_words))
+        model.add(SimpleRNN(128, activation='tanh'))
+        model.add(Dense(maxWordsCount, activation='softmax'))
+        model.summary()
 
-    model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer='adam')
+        model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer='adam')
 
-    history = model.fit(X, Y, batch_size=32, epochs=50)
+        history = model.fit(X, Y, batch_size=32, epochs=50)
 
+        
 
+        self.model = model
+        model.save(self.path)
 
-
-
-    #res = buildPhrase("я слышу шум")
-    #print(res)
+        #res = buildPhrase("я слышу шум")
+        #print(res)
 
