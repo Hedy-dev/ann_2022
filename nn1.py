@@ -9,21 +9,22 @@ from tensorflow.keras.preprocessing.text import Tokenizer, text_to_word_sequence
 from tensorflow.keras.utils import to_categorical
 
 class textPredictor:
-    def __init__():
+    def __init__(self):
         self.model = self.load_model() 
+        self.inp_words = 3
     
-    def load_model(path=""):
+    def load_model(self, path=""):
         pass
-    def buildPhrase(texts, str_len=2):
+    def buildPhrase(self, texts, str_len=2):
         res = texts
         data = tokenizer.texts_to_sequences([texts])[0]
         for i in range(str_len):
             # x = to_categorical(data[i: i + inp_words], num_classes=maxWordsCount)  # преобразуем в One-Hot-encoding
             # inp = x.reshape(1, inp_words, maxWordsCount)
-            x = data[i: i + inp_words]
+            x = data[i: i + self.inp_words]
             inp = np.expand_dims(x, axis=0)
 
-            pred = model.predict(inp)
+            pred = self.model.predict(inp)
             indx = pred.argmax(axis=1)[0]
             data.append(indx)
 
