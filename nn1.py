@@ -7,6 +7,7 @@ from tensorflow.keras.layers import Dense, SimpleRNN, Input, Embedding
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.preprocessing.text import Tokenizer, text_to_word_sequence
 from tensorflow.keras.utils import to_categorical
+import pickle
 
 from tensorflow import keras
 
@@ -16,7 +17,7 @@ class TextPredictor:
         #constants        
         self.inp_words = 3
         self.path = "\\Users\\Xenia\\Desktop\\prog\\python\\alterex\\ann_2022\\saved_model"
-
+        self.tokenizer_path = "\\Users\\Xenia\\Desktop\\prog\\python\\alterex\\ann_2022\\tokenizers"
         self.model = ''
         self.load_model()
     
@@ -30,6 +31,7 @@ class TextPredictor:
 
     def buildPhrase(self, texts, str_len=2):
         res = texts
+        tokenizer = pickle.load(open('tokenizer1.pkl', 'rb'))
         #maxWordsCount = 1000
         #tokenizer = Tokenizer(num_words=maxWordsCount, filters='!–"—#$%&amp;()*+,-./:;<=>?@[\\]^_`{|}~\t\n\r«»',
         #              lower=True, split=' ', char_level=False)
@@ -70,6 +72,9 @@ class TextPredictor:
         print(dist[:10])
 
         data = tokenizer.texts_to_sequences([texts])
+
+        pickle.dump(tokenizer, open('tokenizer1.pkl', 'wb'))
+
         # res = to_categorical(data[0], num_classes=maxWordsCount)
         # print(res.shape)
         res = np.array( data[0] )
