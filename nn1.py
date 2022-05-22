@@ -8,38 +8,40 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.preprocessing.text import Tokenizer, text_to_word_sequence
 from tensorflow.keras.utils import to_categorical
 
-with open('text.txt', 'r', encoding='utf-8') as f:
-    texts = f.read()
-    texts = texts.replace('\ufeff', '')  # убираем первый невидимый символ
 
-maxWordsCount = 1000
-tokenizer = Tokenizer(num_words=maxWordsCount, filters='!–"—#$%&amp;()*+,-./:;<=>?@[\\]^_`{|}~\t\n\r«»',
-                      lower=True, split=' ', char_level=False)
-tokenizer.fit_on_texts([texts])
+def creat_and_train_model():
+    with open('text.txt', 'r', encoding='utf-8') as f:
+        texts = f.read()
+        texts = texts.replace('\ufeff', '')  # убираем первый невидимый символ
 
-dist = list(tokenizer.word_counts.items())
-print(dist[:10])
+    maxWordsCount = 1000
+    tokenizer = Tokenizer(num_words=maxWordsCount, filters='!–"—#$%&amp;()*+,-./:;<=>?@[\\]^_`{|}~\t\n\r«»',
+                          lower=True, split=' ', char_level=False)
+    tokenizer.fit_on_texts([texts])
 
-data = tokenizer.texts_to_sequences([texts])
-# res = to_categorical(data[0], num_classes=maxWordsCount)
-# print(res.shape)
-res = np.array( data[0] )
+    dist = list(tokenizer.word_counts.items())
+    print(dist[:10])
 
-inp_words = 3
-n = res.shape[0] - inp_words
+    data = tokenizer.texts_to_sequences([texts])
+    # res = to_categorical(data[0], num_classes=maxWordsCount)
+    # print(res.shape)
+    res = np.array( data[0] )
 
-X = np.array([res[i:i + inp_words] for i in range(n)])
-Y = to_categorical(res[inp_words:], num_classes=maxWordsCount)
+    inp_words = 3
+    n = res.shape[0] - inp_words
 
-model = Sequential()
-model.add(Embedding(maxWordsCount, 256, input_length = inp_words))
-model.add(SimpleRNN(128, activation='tanh'))
-model.add(Dense(maxWordsCount, activation='softmax'))
-model.summary()
+    X = np.array([res[i:i + inp_words] for i in range(n)])
+    Y = to_categorical(res[inp_words:], num_classes=maxWordsCount)
 
-model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer='adam')
+    model = Sequential()
+    model.add(Embedding(maxWordsCount, 256, input_length = inp_words))
+    model.add(SimpleRNN(128, activation='tanh'))
+    model.add(Dense(maxWordsCount, activation='softmax'))
+    model.summary()
 
-history = model.fit(X, Y, batch_size=32, epochs=50)
+    model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer='adam')
+
+    history = model.fit(X, Y, batch_size=32, epochs=50)
 
 
 def buildPhrase(texts, str_len=2):
@@ -58,7 +60,8 @@ def buildPhrase(texts, str_len=2):
         res += " " + tokenizer.index_word[indx]  # дописываем строку
 
     return res
-
-
+#if __name__ == "__main__":
+#    text = input()
+#    res = buildPhrase(text)
 #res = buildPhrase("я слышу шум")
 #print(res)
