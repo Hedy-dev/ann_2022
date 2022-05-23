@@ -3,7 +3,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 import numpy as np
 
-from tensorflow.keras.layers import Dense, SimpleRNN, Input, Embedding
+from tensorflow.keras.layers import Dense, LSTM, SimpleRNN, Input, Embedding
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.preprocessing.text import Tokenizer, text_to_word_sequence
 from tensorflow.keras.utils import to_categorical
@@ -88,14 +88,17 @@ class TextPredictor:
         #Y = res[inp_words:]
         model = Sequential()
         #model.add(Input((inp_words, maxWordsCount)))
-        model.add(Embedding(maxWordsCount, 256, input_length = inp_words))
-        model.add(SimpleRNN(128, activation='tanh'))
+        model.add(Embedding(maxWordsCount, 128, input_length = inp_words))
+        #model.add(SimpleRNN(128, activation='tanh', return_sequences=True))
+        #model.add(SimpleRNN(64, activation='tanh'))
+        model.add(LSTM(128, return_sequences=True))
+        model.add(LSTM(64))
         model.add(Dense(maxWordsCount, activation='softmax'))
         model.summary()
 
         model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer='adam')
 
-        history = model.fit(X, Y, batch_size=32, epochs=40)
+        history = model.fit(X, Y, batch_size=32, epochs=60)
 
         
 
